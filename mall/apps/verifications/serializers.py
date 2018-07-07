@@ -1,5 +1,8 @@
+from redis.exceptions import RedisError
 from rest_framework import serializers
 from django_redis import get_redis_connection
+import logging
+logger = logging.getLogger('meiduo')
 #我们的序列化器没有关联的模型
 class RegisterSMSCodeserializer(serializers.Serializer):
     text = serializers.CharField(label='用户输入的验证码', max_length=4, min_length=4)
@@ -21,7 +24,10 @@ class RegisterSMSCodeserializer(serializers.Serializer):
         if redis_text is None:
             raise serializers.ValidationError('验证码过期')
         #主动删除已经获取到的 redis中的数据
-        redis_coon.delete('img_%s'%image_code_id)
+        try:
+            redis_coon.delete('img_%s'%image_code_id)
+        except RedisError as e:
+            logger.error(e)
         # 字符串转小写
         if redis_text.decode().lower() != text.lower():
             raise serializers.ValidationError('验证码错误')
