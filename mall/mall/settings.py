@@ -208,9 +208,23 @@ LOGGING = {
 REST_FRAMEWORK = {
     # 异常处理
     'EXCEPTION_HANDLER': 'utils.exceptions.exception_handler',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+import datetime
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+'JWT_RESPONSE_PAYLOAD_HANDLER': 'utils.users.jwt_response_payload_handler',
 }
 #我们现在是采用django 自带的用户模型 因为使用django 自带的认证模型可以使用django自带的认证系统
 #因为我们指定了自定义的用户模型我们需要告知django你需要使用我定义的类
 #我们通过AUTH_USER_MODEL='应用.用户类'
 #注意！！！！AUTH_USER_MODEL  的值只能有一个 点（.）
 AUTH_USER_MODEL = 'users.User'
+AUTHENTICATION_BACKENDS = [
+   'utils.users.UsernameMobileAuthBackend',
+]

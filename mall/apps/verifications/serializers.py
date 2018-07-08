@@ -32,3 +32,15 @@ class RegisterSMSCodeserializer(serializers.Serializer):
         if redis_text.decode().lower() != text.lower():
             raise serializers.ValidationError('验证码错误')
         return attrs
+    def create(self, validated_data):
+
+        #删除多余字段
+        del validated_data['sms_code']
+        del validated_data['password2']
+        del validated_data['allow']
+        user = super().create(validated_data)
+        # 数据 入库后 密码是明文的 所以 将密码 加密
+        # 修改密码
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
