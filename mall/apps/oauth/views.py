@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .utlis import QQOauth
 # Create your views here.
 from rest_framework.views import APIView
+from urllib.request import urlopen
 
 
 class OauthQQURLView(APIView):
@@ -26,3 +27,25 @@ class OauthQQURLView(APIView):
         auth_url=qq.get_oauth_url()
 
         return Response({'auth_url': auth_url})
+
+class OauthQQView(APIView):
+    """
+        # PC网站：https://graph.qq.com/oauth2.0/token
+        # GET
+        # grant_type      必须      授权类型，在本步骤中，此值为“authorization_code”。
+        # client_id       必须      申请QQ登录成功后，分配给网站的appid。
+        # client_secret   必须      申请QQ登录成功后，分配给网站的appkey。
+        # code            必须      上一步返回的authorization
+        # redirect_uri    必须      与上面一步中传入的redirect_uri保持一致。
+    """
+    def get(self,request):
+        #获取code
+        code=request.query_params.get('code')
+        if code is None:
+            return Response(status=400)
+        qq = QQOauth()
+
+        access_token=qq.get_access_token(code)
+        print(access_token)
+
+
