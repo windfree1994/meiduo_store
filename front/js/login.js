@@ -79,8 +79,7 @@ var vm = new Vue({
                     })
             }
         },
-
-        // qq登录
+            // qq登录
         qq_login: function(){
             var state = this.get_query_string('next') || '/';
             axios.get(this.host + '/oauth/qq/statues/?state=' + state, {
@@ -93,5 +92,6 @@ var vm = new Vue({
                     console.log(error.response.data);
                 })
         }
+
     }
 });
