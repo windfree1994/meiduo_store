@@ -10,10 +10,10 @@ class CreateUserSerializer(serializers.ModelSerializer):
     sms_code = serializers.CharField(label='短信验证码', max_length=6, min_length=6, allow_null=False, allow_blank=False,
                                  write_only=True)
     allow = serializers.CharField(label='是否同意协议', allow_null=False, allow_blank=False, write_only=True)
-    token = serializers.CharField(label='token')
+    token = serializers.CharField(label='登录状态token', read_only=True)  # 增加token字段
     class Meta:
         model=User
-        fields=['username','password','mobile','sms_code','password2','allow']
+        fields=['id','username','password','mobile','sms_code','password2','allow','token']
         extra_kwargs = {
             'id': {'read_only': True},
             'username': {
@@ -90,4 +90,5 @@ class CreateUserSerializer(serializers.ModelSerializer):
         # 将用户信息给 荷载
         payload = jwt_payload_handler(user)
         token = jwt_encode_handler(payload)
+        user.token=token
         return user
