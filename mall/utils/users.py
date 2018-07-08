@@ -34,3 +34,27 @@ class UsernameMobileAuthBackend(ModelBackend):
         #user.check_password(password)通过abstractuser 中的方法检测密码
         if user is not None and user.check_password(password):
             return user
+       #也可使用以下方法  将setting 中的 设置更改过来即可
+# class SettingsBackend(object):
+#     """
+#     Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
+#
+#     Use the login name and a hash of the password. For example:
+#
+#     ADMIN_LOGIN = 'admin'
+#     ADMIN_PASSWORD = 'pbkdf2_sha256$30000$Vo0VlMnkR4Bk$qEvtdyZRWTcOsCnI/oQ7fVOu1XAURIZYoOZ3iq8Dr4M='
+#     """
+#
+#     def authenticate(self, request, username=None, password=None):
+#         def authenticate(self, request, username=None, password=None, **kwargs):
+#             user = get_user_by_account(username)
+#             # user.check_password(password)通过abstractuser 中的方法检测密码
+#             if user is not None and user.check_password(password):
+#                 return user
+#         return None
+
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return None

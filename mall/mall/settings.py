@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'verifications.apps.VerificationsConfig',
     'corsheaders',
+    'oauth.apps.OauthConfig'
 ]
 # CORS
 CORS_ORIGIN_WHITELIST = (
@@ -64,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'mall.urls'
@@ -227,4 +229,10 @@ JWT_AUTH = {
 AUTH_USER_MODEL = 'users.User'
 AUTHENTICATION_BACKENDS = [
    'utils.users.UsernameMobileAuthBackend',
+   # 'utils.users.SettingsBackend',
 ]
+QQ_APP_ID = '101474184'
+
+QQ_APP_KEY = 'c6ce949e04e12ecc909ae6a8b09b637c'
+
+QQ_REDIRECT_URL = 'http://www.meiduo.site:8080/oauth_callback.html'
