@@ -1,5 +1,5 @@
 from django.db import models
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer,BadTimeSignature,BadSignature
 # Create your models here.
 from django.db import models
 from utils.models import BaseModel
@@ -25,3 +25,14 @@ class OAuthQQUser(BaseModel):
         #对数据进行处理
         token=serializer.dumps({'openid':openid})
         return token.decode()
+
+    @classmethod
+    def check_openid(cls,token):
+        serializer=Serializer(settings.SECRET_KEY,3600)
+    #根据校验 需要进行try catch操作
+        try:
+            result=serializer.loads(token)
+        except BadSignature:
+            return None
+        else:
+            return result.get('openid')

@@ -25,8 +25,8 @@ class QQOauth(object):
         # 拼接参数
         params = {
             'grant_type': 'authorization_code',
-            'clint_id': settings.QQ_APP_ID,
-            'clint_secret': settings.QQ_APP_KEY,
+            'client_id': settings.QQ_APP_ID,
+            'client_secret': settings.QQ_APP_KEY,
             'code': code,
             'redirect_uri': settings.QQ_REDIRECT_URL
         }
@@ -37,7 +37,7 @@ class QQOauth(object):
         # response可以用read来读取 但是它是Bytes类型
         data = response.read().decode()
         # 将qs 查询字符串格式数据转换为python字典
-        from urllib.parse import parse_qs
+
         res_params = parse_qs(data)
         access_token = res_params['access_token']
         access_token = access_token[0]

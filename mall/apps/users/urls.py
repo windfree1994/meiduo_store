@@ -10,4 +10,5 @@ urlpatterns = [
     # /users/auths/
     url(r'auths/', obtain_jwt_token),
 
+    url(r'^info/$',views.UserCenterInfoView.as_view())
 ]

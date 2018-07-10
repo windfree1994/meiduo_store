@@ -65,7 +65,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
 ]
 
 ROOT_URLCONF = 'mall.urls'
@@ -228,8 +227,8 @@ JWT_AUTH = {
 #注意！！！！AUTH_USER_MODEL  的值只能有一个 点（.）
 AUTH_USER_MODEL = 'users.User'
 AUTHENTICATION_BACKENDS = [
-   'utils.users.UsernameMobileAuthBackend',
-   # 'utils.users.SettingsBackend',
+   # 'utils.users.UsernameMobileAuthBackend',
+   'utils.users.SettingsBackend',
 ]
 QQ_APP_ID = '101474184'
 

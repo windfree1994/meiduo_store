@@ -5,7 +5,7 @@ from .models import User
 from .serializers import CreateUserSerializer
 # Create your views here.
 from rest_framework.views import APIView
-
+from rest_framework.permissions import IsAuthenticated
 
 class RegisterUsernameCountAPIView(APIView):
     """
@@ -47,3 +47,15 @@ class CreateUserView(CreateAPIView):
     需求分析 【功能分析【参数和功能】-----确定HTTP请求方式----确定视图继承自谁】
     """
     serializer_class = CreateUserSerializer
+
+#用户中心==个人 中心
+#APIView  or   GenericaAPIView or  ListAPIView
+class UserCenterInfoView(APIView):
+    """
+    GET/users/infos/
+    获取用户信息  只有登陆用户才可以访问
+    """
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+         serializer=CreateUserSerializer(request.user)
+         return Response(serializer.data)
