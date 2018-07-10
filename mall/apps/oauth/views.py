@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.conf import settings
 from urllib.parse import urlencode
 from rest_framework.response import Response
+
+from oauth.models import OAuthQQUser
 from .utlis import QQOauth
 # Create your views here.
 from rest_framework.views import APIView
@@ -46,6 +48,15 @@ class OauthQQView(APIView):
         qq = QQOauth()
 
         access_token=qq.get_access_token(code)
-        print(access_token)
+
+        openid=qq.get_openid(access_token)
+        #根据openid来判断 用户是否绑定过
+        try:
+            qquse = OAuthQQUser.objects.get(openid=openid)
+        except OAuthQQUser.DoesNotExist:
+            #第一次授权 需要绑定
+            return Response({'openid':openid})
+
+
 
 
