@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
 from .models import User
-from .serializers import CreateUserSerializer
+from .serializers import CreateUserSerializer, UserCenterInfoSerializer
 # Create your views here.
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -49,13 +49,24 @@ class CreateUserView(CreateAPIView):
     serializer_class = CreateUserSerializer
 
 #用户中心==个人 中心
-#APIView  or   GenericaAPIView or  ListAPIView
-class UserCenterInfoView(APIView):
+#APIView  or   GenericaAPIView or  ListAPIView   RetrieveAPIView
+# class UserCenterInfoView(APIView):
+#     """
+#     GET/users/infos/
+#     获取用户信息  只有登陆用户才可以访问
+#     """
+#     permission_classes = [IsAuthenticated]
+#     def get(self,request):
+#          serializer=CreateUserSerializer(request.user)
+#          return Response(serializer.data)
+from rest_framework.generics import RetrieveAPIView
+class UserCenterInfoView(RetrieveAPIView):
     """
     GET/users/infos/
-    获取用户信息  只有登陆用户才可以访问
+    获取用户信息(指定用户的信息)  只有登陆用户才可以访问
     """
     permission_classes = [IsAuthenticated]
-    def get(self,request):
-         serializer=CreateUserSerializer(request.user)
-         return Response(serializer.data)
+    serializer_class = UserCenterInfoSerializer
+    #重写 get_object 方法
+    def get_object(self):
+        return self.request.user
