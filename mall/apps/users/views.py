@@ -70,3 +70,28 @@ class UserCenterInfoView(RetrieveAPIView):
     #重写 get_object 方法
     def get_object(self):
         return self.request.user
+
+
+from rest_framework.generics import UpdateAPIView
+from .serializers import EmailSerializer
+
+class EmailView(UpdateAPIView):
+    """
+
+    1. 当用户点击确定按钮的时候,把 邮箱发送给后台,邮箱需要校验
+    2. 更新 用户的 邮箱信息
+    3. 发送一个激活邮件(链接)
+    4. 激活链接应该如何实现发送
+    5. 邮件如何发送(代码怎么实现)
+    6. 邮件采用celery异步发送
+
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    serializer_class = EmailSerializer
+
+    def get_object(self):
+
+        return self.request.user
+

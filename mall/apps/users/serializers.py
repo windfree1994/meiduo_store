@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import User
 from django_redis import get_redis_connection
+from django.core.mail import send_mail
+from django.conf import settings
 #有关联的模型 数据入库直接调用create 方法 不用自己手动实现
 class CreateUserSerializer(serializers.ModelSerializer):
    #吧用户名 密码 密码2（确认密码）  手机号  短信验证码 是否同意协议 post给我们
@@ -97,3 +99,34 @@ class UserCenterInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'mobile', 'email', 'email_active')
+class EmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id','email')
+        extra_kwargs={
+            'emali':{'requered':True}
+        }
+
+    def update(self, instance, validated_data):
+        #获取邮箱
+        email=validated_data.get('email')
+        #保存数据
+        instance.email=email
+        instance.save()
+        #发送激活邮件
+        #这是同步发送邮件
+        # subject = '美多商城注册邮件'
+        # message = ''
+        # from_email = settings.EMAIL_FROM
+        # recipient_list = [email]
+        # html_message = "<h1>激活邮件</h1>"
+        # send_mail(subject=subject,
+        #           message=message,
+        #           from_email=from_email,
+        #           recipient_list=recipient_list,
+        #           html_message=html_message
+        #           )
+
+
+
+        return instance

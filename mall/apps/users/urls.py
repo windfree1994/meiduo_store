@@ -10,5 +10,8 @@ urlpatterns = [
     # /users/auths/
     url(r'auths/', obtain_jwt_token),
 
-    url(r'^infos/$',views.UserCenterInfoView.as_view())
+    url(r'^infos/$',views.UserCenterInfoView.as_view()),
+
+    # /users/emails/
+    url(r'^emails/$', views.EmailView.as_view()),
 ]
