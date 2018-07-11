@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 # Create your models here.
 class User(AbstractUser):
     """用户模型类"""
@@ -9,3 +11,11 @@ class User(AbstractUser):
         db_table = 'tb_users'
         verbose_name = '用户'
         verbose_name_plural = verbose_name
+
+    def generic_email_token(self,email):
+
+        serializer = Serializer(settings.SECRET_KEY,3600)
+
+        token = serializer.dumps({'email':email,'id':self.id})
+
+        return 'http://www.meiduo.site:8080/success_verify_email.html?token=' + token.decode()
