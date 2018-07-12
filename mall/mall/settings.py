@@ -256,3 +256,6 @@ REST_FRAMEWORK_EXTENSIONS = {
     # 缓存存储
     'DEFAULT_USE_CACHE': 'default',
 }
+#设置FDFS的配置文件
+FDFS_CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
+FDFS_UR='http://192.168.169.129:8888/'
