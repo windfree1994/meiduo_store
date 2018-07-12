@@ -34,7 +34,7 @@ class RegisterPhoneCountAPIView(APIView):
         count=User.objects.filter(mobile=mobile).count()
         context={
             'count':count,
-            'phont':mobile
+            'mobile':mobile
         }
         return Response(context)
 
@@ -95,3 +95,23 @@ class EmailView(UpdateAPIView):
 
         return self.request.user
 
+#邮箱激活
+from rest_framework import status
+class EmailVerifiView(APIView):
+    def get(self,request):
+        #获取激活token 判断token 是否存在
+        token=request.query_params.get('token')
+        #对token进行校验
+        if token is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+            # 2.对token进行校验
+            # 因为我不需要模型对象,所以把模型中的对象方法改为 类方法,静态方法
+        user = User.check_verify_token(token)
+        if user is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        # 3. 改变用户的邮件激活状态
+        user.email_active = True
+        user.save()
+
+        return Response({'message': 'ok'})
+        #改变用户的邮件激活状态

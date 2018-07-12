@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'verifications.apps.VerificationsConfig',
     'corsheaders',
-    'oauth.apps.OauthConfig'
+    'oauth.apps.OauthConfig',
+    'areas.apps.AreasConfig',
 ]
 # CORS
 CORS_ORIGIN_WHITELIST = (
