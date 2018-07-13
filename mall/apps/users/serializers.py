@@ -139,3 +139,31 @@ class EmailSerializer(serializers.ModelSerializer):
 
 
         return instance
+
+from goods.models import SKU
+from django_redis import get_redis_connection
+class UserHistorySerializer(serializers.Serializer):
+    sku_id=serializers.CharField(label='id')
+    def validate(self, attrs):
+        #判断sku_id是否存在
+        sku_id=attrs.get('sku_id')
+        try:
+            sku=SKU.objects.get(pk=sku_id)
+        except Exception:
+            raise serializers.ValidationError('商品不存在')
+        #保存到redis中
+        redis_conn=get_redis_connection('history')
+        #去重
+        user=self.context['request'].user
+        redis_conn.lrem('history_%s'%user.id,0,sku_id)
+        redis_conn.lpush('history_%s' % user.id, sku_id)
+        # 5.保留5条历史记录
+        redis_conn.ltrim('history_%s' % user.id, 0, 4)
+
+        return attrs
+
+class SKUSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SKU
+        fields = ('id', 'name', 'price', 'default_image_url', 'comments')

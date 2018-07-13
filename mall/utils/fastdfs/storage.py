@@ -11,17 +11,21 @@ from django.utils.deconstruct import deconstructible
 
 #1\您的自定义存储系统必须是以下子类 django.core.files.storage.Storage：
 @deconstructible
-class MyStorage(Storage):
+class FastDFSStorage(Storage):
     #2\Django必须能够在没有任何参数的情况下实例化您的存储系统。
     # 这意味着任何设置都应该来自django.conf.settings：
-    def __init__(self, option=None):
-        pass
+    def __init__(self, client_path=None, ip=None):
+
+        if client_path is None:
+            self.client_path = settings.FDFS_CLIENT_CONF
+
+        if ip is None:
+            self.ip = settings.FDFS_URL
 
 
-
-    #3.1您的存储类！！必须实现_open()和_save()！！！ 方法以及适用于您的存储类的任何其他方法。
-    #open打开文件的方法 我们采用的是fastdfs的storage实现的文件下载所以不需要此方法
-    #虽然不需要此方法 但是要求必须实现 所以 不能删除 需要重写此方法
+    # 3. 您的存储类必须实现_open()和_save() 方法以及适用于您的存储类的任何其他方法
+    # 3.1 open 方法是打开文件的方法
+    # 我们是采用的 fastdfs 的storage实现的文件 下载 所以 不需要此方法
     def _open(self, name, mode='rb'):
         pass
 

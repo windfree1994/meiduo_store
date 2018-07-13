@@ -18,7 +18,7 @@ app.config_from_object('celery_tasks.config')
 #我们要让celery 自动检测任务
 #tasks 是个复数形式 可以检测多个任务--》参数就是列表
 #列表中的每一项需要满足：脚本路径。包名
-app.autodiscover_tasks(['celery_tasks.sms','celery_tasks.email'])
+app.autodiscover_tasks(['celery_tasks.sms','celery_tasks.email','celery_tasks.html'])
 #worker  执行是通过指令，自动去执行
 #celery - A 脚本路径.celery的实力文件 worker -l info
-#    虚拟环境中执行c
+#    虚拟环境中执行celery -A celery_tasks.main worker -l info

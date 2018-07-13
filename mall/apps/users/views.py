@@ -1,6 +1,9 @@
 from django.shortcuts import render
+from django_redis import get_redis_connection
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
+
+from  goods.models import SKU
 from .models import User
 from .serializers import CreateUserSerializer, UserCenterInfoSerializer
 # Create your views here.
@@ -115,3 +118,52 @@ class EmailVerifiView(APIView):
 
         return Response({'message': 'ok'})
         #改变用户的邮件激活状态
+
+
+from .serializers import UserHistorySerializer,SKUSerializer
+class UserHistoryView(APIView):
+    """
+    1.必须是登陆用户
+    2.对传递的数据进行校验,将数据保存在redis中,
+    3.我们是采用的list保存数据
+    4。去重
+    5.保留5条历史记录
+     """
+    #必须是登陆的用户
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        #创建序列化器 并且校验
+        serializer=UserHistorySerializer(data=request.data,context={'request':request})
+        serializer.is_valid()
+
+        return Response(serializer.data)
+
+    def get(self,request):
+
+        """
+         1.必须是登录用户
+         2.根据指定用户获取指定的redis数据
+         3. 通过序列化器 对数据进行 序列化操作
+         4.返回数据
+        """
+
+        user = request.user
+
+        redis_conn = get_redis_connection('history')
+
+        sku_ids = redis_conn.lrange('history_%s'%user.id,0,5)
+        # [1,2,3,4,5]
+
+        skus = []
+
+        for sku_id in sku_ids:
+
+            sku = SKU.objects.get(pk=sku_id)
+
+            skus.append(sku)
+
+        # 3.通过序列化器对数据进行序列化操作
+        serializer = SKUSerializer(skus,many=True)
+        # 4.返回数据
+        return Response(serializer.data)
+
