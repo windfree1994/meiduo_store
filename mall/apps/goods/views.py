@@ -3,7 +3,8 @@ from django.views import View
 from collections import OrderedDict
 from .models import GoodsChannel,SKU
 from contents.models import ContentCategory
-from .serializer import SKUSerializer
+from rest_framework_extensions.cache.mixins import ListCacheResponseMixin,RetrieveCacheResponseMixin,CacheResponseMixin
+
 # Create your views here.
 class IndexVIew(View):
     def get(self,request):
@@ -70,8 +71,8 @@ class IndexVIew(View):
 
 
 from rest_framework.generics import ListAPIView
-
-class HotSKUView(ListAPIView):
+from .serializer import SKUSerializer
+class HotSKUView(ListCacheResponseMixin,ListAPIView):
     """
       GET     /goods/categories/(?P<category_id>\d+)/hotskus/
 
@@ -97,8 +98,7 @@ class HotSKUView(ListAPIView):
 
 # from utils.pagintion import StandardResultsSetPagination
 from rest_framework.filters import OrderingFilter
-from .serializer import SKUSerializer
-
+from utils.pagintion import StandardResultsSetPagination
 class SKUListAPIView(ListAPIView):
     """
      GET /goods/categories/(?P<category_id>\d+)/skus/?page=xxx&page_size=xxx&ordering=xxx
@@ -117,4 +117,23 @@ class SKUListAPIView(ListAPIView):
         category_id = self.kwargs['category_id']
         # 只需要把 所有的商品信息获取到就可以
         return SKU.objects.filter(category_id=category_id, is_launched=True)
+    #分页类
+    pagination_class = StandardResultsSetPagination
+    #排序
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['create_time','price','sales']
+
+from .serializer import SKUIndexSerializer
+from drf_haystack.viewsets import HaystackViewSet
+
+class SKUSearchViewSet(HaystackViewSet):
+    """
+    SKU搜索
+    """
+    index_models = [SKU]
+
+    serializer_class = SKUIndexSerializer
+
+
+
 
