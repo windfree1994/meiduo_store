@@ -20,3 +20,8 @@ urlpatterns = [
     url(r'^browerhistories/$', views.UserHistoryView.as_view(), name='history'),
 
 ]
+from .views import AddressViewSet
+from rest_framework.routers import DefaultRouter
+router = DefaultRouter()
+router.register(r'addresses',AddressViewSet,base_name='address')
+urlpatterns += router.urls

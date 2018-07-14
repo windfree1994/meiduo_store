@@ -45,7 +45,7 @@ class AreaView(CacheResponseMixin,ReadOnlyModelViewSet):
 
     """
 
-
+    pagination_class = None
     # queryset = 返回查询的结果集
 
     # queryset = Area.objects.all()

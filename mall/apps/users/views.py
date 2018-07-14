@@ -4,8 +4,10 @@ from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
 
 from  goods.models import SKU
+from rest_framework.viewsets import GenericViewSet
+
 from .models import User
-from .serializers import CreateUserSerializer, UserCenterInfoSerializer
+from .serializers import CreateUserSerializer, UserCenterInfoSerializer,AddressSerializer,AddressTitleSerializer
 # Create your views here.
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -166,4 +168,86 @@ class UserHistoryView(APIView):
         serializer = SKUSerializer(skus,many=True)
         # 4.返回数据
         return Response(serializer.data)
+from rest_framework import mixins
+class AddressViewSet(mixins.ListModelMixin,mixins.CreateModelMixin,mixins.UpdateModelMixin,GenericViewSet):
+    """
+    用户地址新增与修改
+    list GET: /users/addresses/
+    create POST: /users/addresses/
+    destroy DELETE: /users/addresses/
+    action PUT: /users/addresses/pk/status/
+    action PUT: /users/addresses/pk/title/
+    """
+
+    #制定序列化器
+    serializer_class = AddressSerializer
+    #添加用户权限
+    permission_classes = [IsAuthenticated]
+    #由于用户的地址有存在删除的状态,所以我们需要对数据进行筛选
+    def get_queryset(self):
+        return self.request.user.addresses.filter(is_deleted=False)
+
+    def create(self, request, *args, **kwargs):
+        """
+        保存用户地址数据
+        """
+        count = request.user.addresses.count()
+        if count >= 20:
+            return Response({'message':'保存地址数量已经达到上限'},status=status.HTTP_400_BAD_REQUEST)
+
+        return super().create(request,*args,**kwargs)
+
+    def list(self, request, *args, **kwargs):
+        """
+        获取用户地址列表
+        """
+        # 获取所有地址
+        queryset = self.get_queryset()
+        # 创建序列化器
+        serializer = self.get_serializer(queryset, many=True)
+        user = self.request.user
+        # 响应
+        return Response({
+            'user_id': user.id,
+            'default_address_id': user.default_address_id,
+            'limit': 20,
+            'addresses': serializer.data,
+        })
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        处理删除
+        """
+        address = self.get_object()
+
+        # 进行逻辑删除
+        address.is_deleted = True
+        address.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    from rest_framework.decorators import action
+
+
+    @action(methods=['put'], detail=True)
+    def title(self, request, pk=None, address_id=None):
+        """
+        修改标题
+        """
+        address = self.get_object()
+        serializer = AddressTitleSerializer(instance=address, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @action(methods=['put'], detail=True)
+    def status(self, request, pk=None, address_id=None):
+        """
+        设置默认地址
+        """
+        address = self.get_object()
+        request.user.default_address = address
+        request.user.save()
+        return Response({'message': 'OK'}, status=status.HTTP_200_OK)
+
 

@@ -71,6 +71,28 @@ var vm = new Vue({
             }
         }
     },
+    created: function(){
+
+        axios.get(this.host + '/users/addresses/', {
+                headers: {
+                    'Authorization': 'JWT ' + this.token
+                },
+                responseType: 'json'
+            })
+            .then(response => {
+                this.addresses = response.data.addresses;
+                this.limit = response.data.limit;
+                this.default_address_id = response.data.default_address_id;
+            })
+            .catch(error => {
+                status = error.response.status;
+                if (status == 401 || status == 403) {
+                    location.href = 'login.html?next=/user_center_site.html';
+                } else {
+                    alert(error.response.data.detail);
+                }
+            })
+    },
     methods: {
         // 退出
         logout: function(){
@@ -138,9 +160,9 @@ var vm = new Vue({
                 }
             }
         },
-        // 保存地址
+         // 保存地址
         save_address: function(){
-             if (this.error_receiver || this.error_place || this.error_mobile || this.error_email || !this.form_address.province_id || !this.form_address.city_id || !this.form_address.district_id ) {
+            if (this.error_receiver || this.error_place || this.error_mobile || this.error_email || !this.form_address.province_id || !this.form_address.city_id || !this.form_address.district_id ) {
                 alert('信息填写有误！');
             } else {
                 this.form_address.title = this.form_address.receiver;
@@ -179,21 +201,67 @@ var vm = new Vue({
                 }
             }
         },
+
         // 删除地址
         del_address: function(index){
-
+            axios.delete(this.host + '/users/addresses/' + this.addresses[index].id + '/', {
+                    headers: {
+                        'Authorization': 'JWT ' + this.token
+                    },
+                    responseType: 'json'
+                })
+                .then(response => {
+                    // 从数组中移除地址
+                    this.addresses.splice(index, 1);
+                })
+                .catch(error => {
+                    console.log(error.response.data);
+                })
         },
         // 设置默认地址
         set_default: function(index){
-
+            axios.put(this.host + '/users/addresses/' + this.addresses[index].id + '/status/', {}, {
+                    headers: {
+                        'Authorization': 'JWT ' + this.token
+                    },
+                    responseType: 'json'
+                })
+                .then(response => {
+                    this.default_address_id = this.addresses[index].id;
+                })
+                .catch(error => {
+                    console.log(error.response.data);
+                })
         },
         // 展示编辑标题
         show_edit_title: function(index){
-
+            this.input_title = this.addresses[index].title;
+            for(var i=0; i<index; i++) {
+                this.is_set_title.push(false);
+            }
+            this.is_set_title.push(true);
         } ,
         // 保存地址标题
         save_title: function(index){
-
+            if (!this.input_title) {
+                alert("请填写标题后再保存！");
+            } else {
+                axios.put(this.host + '/users/addresses/' + this.addresses[index].id + '/title/', {
+                        title: this.input_title
+                    }, {
+                        headers: {
+                            'Authorization': 'JWT ' + token
+                        },
+                        responseType: 'json'
+                    })
+                    .then(response => {
+                        this.addresses[index].title = this.input_title;
+                        this.is_set_title = [];
+                    })
+                    .catch(error => {
+                        console.log(error.response.data);
+                    })
+            }
         },
         // 取消保存地址
         cancel_title: function(index){
