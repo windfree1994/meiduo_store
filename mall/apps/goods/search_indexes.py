@@ -15,7 +15,7 @@ class SKUIndex(indexes.SearchIndex, indexes.Indexable):
     # 您需要在调用的模板目录中创建一个新模板
     text = indexes.CharField(document=True, use_template=True)
 
-    #以下字段用于数据展示
+    #以下字段用于数据展示  注意与model中一样
     id = indexes.IntegerField(model_attr='id')
     name = indexes.CharField(model_attr='name')
     price = indexes.DecimalField(model_attr='price')
